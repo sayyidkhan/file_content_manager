@@ -9,11 +9,12 @@ def setup_logger(log_file):
 def log_failed_file(file_path, error):
     logging.error(f"Failed to restore: {file_path}\nError: {error}")
 
-def restore_file_structure(consolidated_file, output_dir, log_file):
+def restore_file_structure(consolidated_file, log_file):
     setup_logger(log_file)
     root_dir = None
     current_file = None
     content = []
+    output_dir = Path("rebuild")
     
     with open(consolidated_file, 'r', encoding='utf-8') as infile:
         for line in infile:
@@ -23,7 +24,7 @@ def restore_file_structure(consolidated_file, output_dir, log_file):
                 if current_file:
                     write_file(current_file, content, log_file)
                 relative_path = line.split(": ", 1)[1].strip()
-                current_file = Path(output_dir) / relative_path
+                current_file = output_dir / relative_path
                 content = []
             elif line.startswith("# Full path: "):
                 pass  # We don't need this for restoration
@@ -52,8 +53,8 @@ def write_file(path, content, log_file):
         log_failed_file(path, str(e))
 
 if __name__ == "__main__":
-    consolidated_file = input("Enter the path to the consolidated file: ")
-    output_directory = input("Enter the output directory path where files should be restored: ")
-    log_file = input("Enter the log file name (including path if desired): ")
+    consolidated_file = input("Enter the path to the consolidated file: ").strip()
+    root_directory = Path(consolidated_file).parent
+    log_file = root_directory / "restoration_log.txt"
     
-    restore_file_structure(consolidated_file, output_directory, log_file)
+    restore_file_structure(consolidated_file, log_file)
