@@ -1,0 +1,4 @@
+# ignore intellij files
+.idea
+# ignore pyc files
+.pyc
